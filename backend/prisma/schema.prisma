@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User/Company managing presentations
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String?
+  company       String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  presentations Presentation[]
+}
+
+// Main presentation template
+model Presentation {
+  id          String              @id @default(cuid())
+  title       String
+  slug        String              @unique
+  templateId  String              @default("justjoinit-proposal")
+  content     Json                // Full presentation structure
+  settings    Json                @default("{}")
+  thumbnail   String?
+  userId      String
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  versions    PresentationVersion[]
+  analytics   Analytics[]
+
+  @@index([userId])
+  @@index([slug])
+}
+
+// Personalized versions for different recipients
+model PresentationVersion {
+  id             String        @id @default(cuid())
+  presentationId String
+  presentation   Presentation  @relation(fields: [presentationId], references: [id], onDelete: Cascade)
+  versionSlug    String        @unique // URL slug for this version
+  editToken      String        @unique // Token for editable link
+  viewToken      String        @unique // Token for view-only link
+  recipientName  String?
+  recipientEmail String?
+  variables      Json          @default("{}") // Dynamic variables for this version
+  password       String?       // Optional password protection
+  expiresAt      DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  views          ViewAnalytics[]
+
+  @@index([presentationId])
+  @@index([versionSlug])
+  @@index([editToken])
+  @@index([viewToken])
+}
+
+// Analytics for presentations
+model Analytics {
+  id             String       @id @default(cuid())
+  presentationId String
+  presentation   Presentation @relation(fields: [presentationId], references: [id], onDelete: Cascade)
+  totalViews     Int          @default(0)
+  uniqueViewers  Int          @default(0)
+  avgTimeSpent   Float        @default(0) // in seconds
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([presentationId])
+}
+
+// Individual view sessions
+model ViewAnalytics {
+  id        String              @id @default(cuid())
+  versionId String
+  version   PresentationVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  sessionId String              // Unique session identifier
+  ipAddress String?
+  userAgent String?
+  country   String?
+  city      String?
+  device    String?
+  browser   String?
+
+  // Engagement metrics
+  timeSpent Int                 @default(0) // seconds
+  scrollDepth Float             @default(0) // percentage (0-100)
+  sectionsViewed Json            @default("[]") // array of section IDs
+  clicks    Json                @default("[]") // clicked elements
+
+  viewedAt  DateTime            @default(now())
+  lastPing  DateTime            @default(now())
+
+  @@index([versionId])
+  @@index([sessionId])
+}
+
+// Pipedrive integration log
+model PipedriveWebhook {
+  id          String   @id @default(cuid())
+  dealId      String
+  dealData    Json
+  generatedId String?  // ID of generated presentation
+  status      String   // "pending", "success", "error"
+  error       String?
+  createdAt   DateTime @default(now())
+
+  @@index([dealId])
+  @@index([status])
+}
+
+// Template definitions
+model Template {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  thumbnail   String?
+  structure   Json     // Template structure/schema
+  defaultData Json     @default("{}")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+}
