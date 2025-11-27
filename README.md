@@ -134,7 +134,40 @@ Gdy deal zostanie zaktualizowany w Pipedrive, automatycznie wygeneruje się prez
 
 ## 📦 Deployment
 
-### Opcja 1: Vercel (Frontend) + własny serwer (Backend)
+### Opcja 1: Vercel (Frontend) + Render.com (Backend) - **RECOMMENDED**
+
+**Backend (Render.com):**
+
+1. Połącz repozytorium GitHub z Render.com
+2. Utwórz nowy **Web Service**:
+   - **Build Command**: `cd backend && npm install && npx prisma generate && npm run build`
+   - **Start Command**: `cd backend && npm start`
+   - **Environment**: Node
+3. Dodaj zmienne środowiskowe w Render Dashboard:
+   - `DATABASE_URL` - automatycznie z Render PostgreSQL
+   - `FRONTEND_URL` - URL Vercel (np. `https://twoja-app.vercel.app`)
+   - `JWT_SECRET` - wygeneruj losowy string
+   - `PIPEDRIVE_API_TOKEN` - twój token Pipedrive
+4. Utwórz **PostgreSQL Database** w Render
+5. Deploy!
+
+Lub użyj automatycznego deploymentu z `render.yaml`:
+```bash
+# render.yaml jest już skonfigurowany w repozytorium
+# Po prostu połącz repo z Render.com i auto-wykryje konfigurację
+```
+
+**Frontend (Vercel):**
+
+1. Połącz repozytorium z Vercel
+2. Ustaw **Root Directory**: `frontend`
+3. Dodaj zmienną środowiskową:
+   - `VITE_API_URL` - URL twojego backendu z Render
+4. Deploy!
+
+---
+
+### Opcja 2: Vercel (Frontend) + własny serwer (Backend)
 
 **Backend:**
 
@@ -170,7 +203,7 @@ vercel
 W ustawieniach Vercel dodaj zmienną środowiskową:
 - `VITE_API_URL`: URL twojego backendu
 
-### Opcja 2: Docker (Całość)
+### Opcja 3: Docker (Całość)
 
 Stwórz `docker-compose.yml`:
 
@@ -216,7 +249,7 @@ Uruchom:
 docker-compose up -d
 ```
 
-### Opcja 3: Własny serwer (wszystko razem)
+### Opcja 4: Własny serwer (wszystko razem)
 
 Używając nginx jako reverse proxy:
 
