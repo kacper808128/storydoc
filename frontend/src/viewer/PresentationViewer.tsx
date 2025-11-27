@@ -29,7 +29,7 @@ interface PresentationData {
   expiresAt?: string;
 }
 
-export default function PresentationViewer({ mode }: PresentationViewerProps) {
+export default function PresentationViewer({ mode: _mode }: PresentationViewerProps) {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -38,7 +38,7 @@ export default function PresentationViewer({ mode }: PresentationViewerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { trackView, trackEngagement, sessionId } = useAnalytics();
+  const { trackView, trackEngagement } = useAnalytics();
 
   // Fetch presentation data
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function PresentationViewer({ mode }: PresentationViewerProps) {
 
     const sections = gsap.utils.toArray<HTMLElement>('.presentation-section');
 
-    sections.forEach((section, index) => {
+    sections.forEach((section) => {
       const elements = section.querySelectorAll('[data-animate]');
 
       elements.forEach((element) => {
