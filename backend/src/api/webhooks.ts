@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { nanoid } from 'nanoid';
-import type { PipedriveWebhookPayload, JustJoinITProposal } from '../../../shared/types';
+import type { PipedriveWebhookPayload, JustJoinITProposal } from '../types';
 import { generateJustJoinITPresentation } from '../services/templateGenerator';
 
 const router = Router();
@@ -88,7 +88,7 @@ router.post('/pipedrive', async (req, res, next) => {
           title: `${proposalData.offerTitle} - ${proposalData.clientName}`,
           slug,
           templateId: 'justjoinit-proposal',
-          content: presentationContent,
+          content: presentationContent as any,
           settings: {
             theme: {
               primaryColor: proposalData.primaryColor,

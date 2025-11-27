@@ -1,4 +1,4 @@
-import type { TemplateDefinition } from '../../../shared/types';
+import type { TemplateDefinition } from '../types';
 
 export function getJustJoinITTemplate(): TemplateDefinition {
   return {
