@@ -124,10 +124,11 @@ router.get('/:slug', async (req, res, next) => {
     let content = version.presentation.content as any;
 
     // Replace variables in content
+    const variables = version.variables as Record<string, any> || {};
     const replaceVariables = (obj: any): any => {
       if (typeof obj === 'string') {
         return obj.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-          return version.variables[key as keyof typeof version.variables] || match;
+          return variables[key] || match;
         });
       }
       if (Array.isArray(obj)) {

@@ -1,4 +1,4 @@
-import type { JustJoinITProposal, PresentationContent } from '../../../shared/types';
+import type { JustJoinITProposal, PresentationContent } from '../types';
 
 export function generateJustJoinITPresentation(data: JustJoinITProposal): PresentationContent {
   return {
