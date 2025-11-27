@@ -13,7 +13,7 @@ interface SectionRendererProps {
   };
 }
 
-export default function SectionRenderer({ section, index, theme }: SectionRendererProps) {
+export default function SectionRenderer({ section, index: _index, theme }: SectionRendererProps) {
   const getBackgroundStyle = () => {
     if (!section.background) return {};
 
