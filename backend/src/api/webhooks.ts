@@ -154,19 +154,33 @@ router.post('/pipedrive', async (req, res, next) => {
         },
       });
     } catch (error: any) {
-      // Update webhook log with error
-      await prisma.pipedriveWebhook.update({
-        where: { id: webhookLog.id },
-        data: {
-          status: 'error',
-          error: error.message,
-        },
-      });
+      // Update webhook log with error (if webhookLog exists)
+      try {
+        if (webhookLog?.id) {
+          await prisma.pipedriveWebhook.update({
+            where: { id: webhookLog.id },
+            data: {
+              status: 'error',
+              error: error.message,
+            },
+          });
+        }
+      } catch (logError) {
+        console.error('Failed to update webhook log:', logError);
+      }
 
       throw error;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Pipedrive webhook error:', error);
+
+    // Always return a response
+    if (!res.headersSent) {
+      return res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error',
+      });
+    }
     next(error);
   }
 });
