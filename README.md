@@ -29,7 +29,6 @@ storydoc/
 - TypeScript
 - Prisma ORM
 - PostgreSQL
-- Puppeteer (PDF export)
 
 **Frontend:**
 - React 18
